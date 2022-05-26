@@ -6,8 +6,14 @@
 #include <iomanip>
 #include <map>
 #include <sstream>
+#include <chrono>
 
 std::string g_filePath;
+
+//typedef std::chrono::steady_clock::time_point Time;
+//typedef std::chrono::high_resolution_clock HiResClock;
+//typedef std::chrono::duration<float> TimeDiff;
+
 
 struct vec4
 {
@@ -25,6 +31,10 @@ struct OBJVertex
 	vec4 normal;
 	vec2 uvCoord;
 };
+
+//variables
+int frameCounter = 0;
+
 
 
 bool ProcessLine(const std::string& a_inLine, std::string& a_outKey, std::string& a_outValue)
@@ -115,15 +125,18 @@ OBJVertex processFaceData(std::string a_faceData, std::vector<vec4>& a_vertexArr
 
 int main(int argc, char* argv[])
 {
+	//initialise time count
+	std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
 	std::string filename = "obj_models/basic_box.obj";
 	std::cout << "Attempting to open file: " << filename << std::endl;
 	//use fstream to read file data
 	std::fstream file;
 	file.open(filename, std::ios_base::in | std::ios_base::binary);
-
 	
 	if (file.is_open())
 	{
+
 		std::cout << "Successfully Opened!" << std::endl;
 		file.ignore(std::numeric_limits<std::streamsize>::max());
 		std::streamsize fileSize = file.gcount();
@@ -213,10 +226,15 @@ int main(int argc, char* argv[])
 			normalData.clear();
 			textureData.clear();
 			std::cout << "Processed " << vertexData.size() << "vertices in OBJ File" << std::endl;
+			std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+			std::cout << "time taken: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << std::endl;
 		}
 		else
 		{
 			std::cout << "File contains no data, closing file" << std::endl;
+			std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+			std::cout << "time taken: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << std::endl;
 		}
 		file.close();
 	}
